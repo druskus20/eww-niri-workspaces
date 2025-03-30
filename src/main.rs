@@ -14,11 +14,10 @@ fn main() {
     match r {
         Ok(_) => loop {
             let event = block_read_next_event().unwrap();
-            dbg!(get_event_name_str(&event));
             state.update_with_event(event);
             let serializable_state = serializable::SerializableState::from(&state);
             let json = serde_json::to_string(&serializable_state).unwrap();
-            dbg!(json);
+            println!("{}", json);
         },
         Err(e) => {
             eprintln!("Niri error: {}", e);
