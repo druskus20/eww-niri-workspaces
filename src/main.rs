@@ -1,4 +1,4 @@
-use niri_ipc::{socket::Socket, Event, Window, WindowLocation, Workspace};
+use niri_ipc::{socket::Socket, Event, Window, Workspace};
 
 mod serializable;
 
@@ -16,9 +16,8 @@ fn main() {
             let event = block_read_next_event().unwrap();
             dbg!(get_event_name_str(&event));
             state.update_with_event(event);
-            serializable::SerializableState::from(&state);
-            let json =
-                serde_json::to_string(&serializable::SerializableState::from(&state)).unwrap();
+            let serializable_state = serializable::SerializableState::from(&state);
+            let json = serde_json::to_string(&serializable_state).unwrap();
             dbg!(json);
         },
         Err(e) => {

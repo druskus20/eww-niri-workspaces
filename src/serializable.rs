@@ -82,7 +82,7 @@ impl From<&State> for SerializableState {
                 .0;
             workspace.windows.push(Window {
                 id: window.id,
-                column: window.location.tile_pos_in_scrolling_layout.unwrap().0,
+                column,
                 is_focused: window.is_focused,
             });
         }
