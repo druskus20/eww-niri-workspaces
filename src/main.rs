@@ -26,21 +26,6 @@ fn main() {
     }
 }
 
-fn get_event_name_str(e: &Event) -> &'static str {
-    match e {
-        Event::WorkspacesChanged { .. } => "WorkspacesChanged",
-        Event::WorkspaceActivated { .. } => "WorkspaceActivated",
-        Event::WorkspaceActiveWindowChanged { .. } => "WorkspaceActiveWindowChanged",
-        Event::WindowsChanged { .. } => "WindowsChanged",
-        Event::WindowOpenedOrChanged { .. } => "WindowOpenedOrChanged",
-        Event::WindowClosed { .. } => "WindowClosed",
-        Event::WindowFocusChanged { .. } => "WindowFocusChanged",
-        Event::WindowsLocationsChanged { .. } => "WindowsLocationsChanged",
-        Event::KeyboardLayoutsChanged { .. } => "KeyboardLayoutsChanged",
-        Event::KeyboardLayoutSwitched { .. } => "KeyboardLayoutSwitched",
-    }
-}
-
 #[derive(Debug, Default)]
 struct State {
     workspaces: Vec<Workspace>,
@@ -57,15 +42,30 @@ impl State {
         match e {
             Event::WorkspacesChanged { workspaces } => self.workspaces = workspaces,
             Event::WorkspaceActivated { id, focused } => {
+                // If this workspace is focused, unfocus all others
                 if focused {
-                    // All other workspaces become not focused
-                    for workspace in self.workspaces.iter_mut() {
+                    for workspace in &mut self.workspaces {
                         workspace.is_focused = false;
                     }
                 }
-                if let Some(workspace) = self.workspaces.iter_mut().find(|w| w.id == id) {
-                    workspace.is_active = true;
-                    workspace.is_focused = focused;
+
+                // Find and update the activated workspace
+                let activated_output = match self.workspaces.iter_mut().find(|w| w.id == id) {
+                    Some(workspace) => {
+                        workspace.is_active = true;
+                        workspace.is_focused = focused;
+                        workspace.output.clone()
+                    }
+                    None => panic!("Workspace not found"),
+                };
+
+                // Deactivate other workspaces on the same output
+                if activated_output.is_some() {
+                    for workspace in &mut self.workspaces {
+                        if workspace.id != id && workspace.output == activated_output {
+                            workspace.is_active = false;
+                        }
+                    }
                 }
             }
             Event::WorkspaceActiveWindowChanged {

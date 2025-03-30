@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 /// Serializable state ready to be consumed by Eww as Json
 ///
 /// The json should have: Output -> Workspaces -> Windows { positons }
-use serde::Serialize;
+use serde::{Serialize, Serializer};
 
 use crate::State;
 
@@ -14,11 +14,13 @@ pub(crate) struct SerializableState {
 
 #[derive(Serialize)]
 struct Output {
+    #[serde(serialize_with = "ordered_map_as_list")]
     workspaces: BTreeMap<u64, Workspace>,
 }
 #[derive(Serialize)]
 struct Workspace {
     id: u64,
+    #[serde(serialize_with = "ordered_map_as_list")]
     columns: BTreeMap<usize, Column>,
     is_active: bool,
 }
@@ -36,6 +38,17 @@ struct Window {
     id: u64,
     column: usize,
     is_focused: bool,
+}
+
+fn ordered_map_as_list<S, T>(
+    map: &BTreeMap<T, impl Serialize>,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let list: Vec<_> = map.values().collect();
+    list.serialize(serializer)
 }
 
 impl From<&State> for SerializableState {
