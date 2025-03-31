@@ -1,12 +1,9 @@
-use std::collections::BTreeMap;
-
-/// Serializable state ready to be consumed by Eww as Json
-///
-/// The json should have: Output -> Workspaces -> Windows { positons }
 use serde::{Serialize, Serializer};
+use std::collections::BTreeMap;
 
 use crate::State;
 
+/// Serializable state ready to be consumed by Eww as Json
 #[derive(Serialize)]
 pub(crate) struct SerializableState {
     outputs: BTreeMap<String, Output>,
