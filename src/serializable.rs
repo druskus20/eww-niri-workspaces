@@ -20,6 +20,7 @@ struct Output {
 #[derive(Serialize)]
 struct Workspace {
     id: u64,
+    index: u8,
     #[serde(serialize_with = "ordered_map_as_list")]
     columns: BTreeMap<usize, Column>,
     is_active: bool,
@@ -72,6 +73,7 @@ impl From<&State> for SerializableState {
                 workspace.id,
                 Workspace {
                     id: workspace.id,
+                    index: workspace.idx,
                     columns: BTreeMap::new(),
                     is_active: workspace.is_active,
                 },
