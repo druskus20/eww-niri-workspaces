@@ -108,7 +108,7 @@ impl State {
                     }
                 }
             }
-            Event::WindowsLocationsChanged { changes } => {
+            Event::WindowLayoutsChanged { changes } => {
                 for (id, window_location) in changes {
                     if let Some(window) = self.windows.iter_mut().find(|w| w.id == id) {
                         window.location = window_location;
