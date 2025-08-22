@@ -94,8 +94,8 @@ impl From<&State> for SerializableState {
             };
 
             let column_index = window
-                .location
-                .tile_pos_in_scrolling_layout
+                .layout
+                .pos_in_scrolling_layout
                 .expect(
                     "Tile position not set, something is wrong, non-floating windows should have a tile position",
                 )

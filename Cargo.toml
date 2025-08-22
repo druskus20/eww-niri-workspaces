@@ -1,11 +1,11 @@
 [package]
 name = "eww-niri-workspaces"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
-#niri-ipc = { git = "https://github.com/YaLTeR/niri", tag = "v0.1.9" }
-niri-ipc = { git = "https://github.com/yrkv/niri", branch = "main" }
-serde = "1.0.219"
+#niri-ipc = { git = "https://github.com/YaLTeR/niri", tag = "v25.05.1" }
+niri-ipc = { rev = "210d5e90fe00ae9add5d841e1752b7f8c4a639a7", git = "https://github.com/YaLTeR/niri" }
+serde = "1.0"
 serde_json = "1.0"
 eyre = "0.6"

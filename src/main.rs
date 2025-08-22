@@ -1,27 +1,24 @@
-use niri_ipc::{socket::Socket, Event, Window, Workspace};
+use niri_ipc::{socket::Socket, Event, Request, Response, Window, Workspace};
 
 mod serializable;
 
 fn main() {
     let mut state = State::new();
     let niri_socket_env = std::env::var("NIRI_SOCKET");
-    let connection = if let Ok(niri_socket) = niri_socket_env {
+    let mut socket = if let Ok(niri_socket) = niri_socket_env {
         Socket::connect_to(niri_socket).unwrap()
     } else {
         Socket::connect().unwrap()
     };
-    let (r, mut block_read_next_event) = connection.send(niri_ipc::Request::EventStream).unwrap();
-    match r {
-        Ok(_) => loop {
-            let event = block_read_next_event().unwrap();
+    let reply = socket.send(Request::EventStream).unwrap();
+    if matches!(reply, Ok(Response::Handled)) {
+        let mut read_event = socket.read_events(); // ownership moves here
+        while let Ok(event) = read_event() {
+            println!("Received event: {event:?}");
             state.update_with_event(event);
             let serializable_state = serializable::SerializableState::from(&state);
             let json = serde_json::to_string(&serializable_state).unwrap();
             println!("{}", json);
-        },
-        Err(e) => {
-            eprintln!("Niri error: {}", e);
-            std::process::exit(1);
         }
     }
 }
@@ -108,15 +105,19 @@ impl State {
                     }
                 }
             }
-            Event::WindowsLocationsChanged { changes } => {
-                for (id, window_location) in changes {
+            Event::WindowLayoutsChanged { changes } => {
+                for (id, window_layout) in changes {
                     if let Some(window) = self.windows.iter_mut().find(|w| w.id == id) {
-                        window.location = window_location;
+                        window.layout = window_layout;
                     }
                 }
             }
             Event::KeyboardLayoutsChanged { .. } => { /* Do nothing */ }
             Event::KeyboardLayoutSwitched { .. } => { /* Do nothing */ }
+            Event::WorkspaceUrgencyChanged { .. } => { /* Do nothing */ }
+            Event::WindowUrgencyChanged { .. } => { /* Do nothing */ }
+            Event::OverviewOpenedOrClosed { .. } => { /* Do nothing */ }
+            Event::ConfigLoaded { .. } => { /* Do nothing */ }
         }
     }
 }
