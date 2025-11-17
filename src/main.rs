@@ -1,4 +1,4 @@
-use niri_ipc::{socket::Socket, Event, Request, Response, Window, Workspace};
+use niri_ipc::{Event, Request, Response, Window, Workspace, socket::Socket};
 
 mod serializable;
 
@@ -18,7 +18,7 @@ fn main() {
             state.update_with_event(event);
             let serializable_state = serializable::SerializableState::from(&state);
             let json = serde_json::to_string(&serializable_state).unwrap();
-            println!("{}", json);
+            println!("{json}");
         }
     }
 }
@@ -118,6 +118,15 @@ impl State {
             Event::WindowUrgencyChanged { .. } => { /* Do nothing */ }
             Event::OverviewOpenedOrClosed { .. } => { /* Do nothing */ }
             Event::ConfigLoaded { .. } => { /* Do nothing */ }
+            Event::WindowFocusTimestampChanged {
+                id,
+                focus_timestamp,
+            } => {
+                if let Some(window) = self.windows.iter_mut().find(|w| w.id == id) {
+                    window.focus_timestamp = focus_timestamp;
+                }
+            }
+            Event::ScreenshotCaptured { .. } => { /* Do nothing */ }
         }
     }
 }
