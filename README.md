@@ -8,6 +8,9 @@ A rust binary that outputs workspace information from niri-ipc to be consumed by
 ## Example widget 
 
 ```clojure
+(workspaces :monitor "HDMI-1")
+(deflisten workspaces "scripts/eww-niri-workspaces")
+
 (defwidget workspaces [monitor]
   (box :orientation "h" 
        :class "workspaces"
