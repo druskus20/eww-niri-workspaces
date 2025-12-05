@@ -6,7 +6,7 @@ fn main() {
     let mut state = State::new();
     let niri_socket_env = std::env::var("NIRI_SOCKET");
     let mut socket = if let Ok(niri_socket) = niri_socket_env {
-        Socket::connect_to(niri_socket).unwrap()
+        Socket::connect_to(niri_socket).expect("Failed to connect to Niri socket")
     } else {
         Socket::connect().unwrap()
     };
@@ -14,7 +14,6 @@ fn main() {
     if matches!(reply, Ok(Response::Handled)) {
         let mut read_event = socket.read_events(); // ownership moves here
         while let Ok(event) = read_event() {
-            println!("Received event: {event:?}");
             state.update_with_event(event);
             let serializable_state = serializable::SerializableState::from(&state);
             let json = serde_json::to_string(&serializable_state).unwrap();
