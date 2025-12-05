@@ -111,12 +111,6 @@ impl State {
                     }
                 }
             }
-            Event::KeyboardLayoutsChanged { .. } => { /* Do nothing */ }
-            Event::KeyboardLayoutSwitched { .. } => { /* Do nothing */ }
-            Event::WorkspaceUrgencyChanged { .. } => { /* Do nothing */ }
-            Event::WindowUrgencyChanged { .. } => { /* Do nothing */ }
-            Event::OverviewOpenedOrClosed { .. } => { /* Do nothing */ }
-            Event::ConfigLoaded { .. } => { /* Do nothing */ }
             Event::WindowFocusTimestampChanged {
                 id,
                 focus_timestamp,
@@ -125,7 +119,7 @@ impl State {
                     window.focus_timestamp = focus_timestamp;
                 }
             }
-            Event::ScreenshotCaptured { .. } => { /* Do nothing */ }
+            _ => { /* Do nothing */ }
         }
     }
 }
