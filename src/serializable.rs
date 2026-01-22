@@ -12,7 +12,7 @@ pub(crate) struct SerializableState {
 #[derive(Serialize)]
 struct Output {
     #[serde(serialize_with = "ordered_map_as_list")]
-    workspaces: BTreeMap<u64, Workspace>,
+    workspaces: BTreeMap<u8, Workspace>,
 }
 #[derive(Serialize)]
 struct Workspace {
@@ -68,7 +68,7 @@ impl From<&State> for SerializableState {
                 });
 
             output.workspaces.insert(
-                workspace.id,
+                workspace.idx,
                 Workspace {
                     id: workspace.id,
                     index: workspace.idx,
